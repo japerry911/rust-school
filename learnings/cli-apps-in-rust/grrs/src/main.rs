@@ -1,5 +1,7 @@
 use clap::Parser;
 
+use anyhow::{Context, Result};
+
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 struct Cli {
@@ -12,7 +14,9 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
 
-    let content = std::fs::read_to_string(&args.path).expect("could not read file");
+    let content = std::fs::read_to_string(args.path)
+        .with_context(|| format!("could not read file `{:?}`", args.path));
+    Ok(());
 
     for line in content.lines() {
         if line.contains(&args.pattern) {
